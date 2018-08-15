@@ -2,6 +2,7 @@ var fs = require('fs');
 var readline = require('readline');
 var phonebookFile = './phonebook.json';
 var phonebookCurrent = {};
+var menu = '\nElectronic Phone Book\n=====================\n1. Look up an entry\n2. Set an entry\n3. Delete an entry\n4. List all entries\n5. Quit\nWhat do you want to do (1-5)? ';
 
 var rl = readline.createInterface({
     input: process.stdin,
@@ -17,7 +18,7 @@ var main = function () {
             phonebookCurrent = JSON.parse(data);
         }
     });
-    rl.question('Electronic Phone Book\n=====================\n1. Look up an entry\n2. Set an entry\n3. Delete an entry\n4. List all entries\n5. Quit\nWhat do you want to do (1-5)? ', function(answer) {
+    rl.question(menu, function(answer) {
         if (answer === '5') {
             rl.close();
         }
@@ -25,11 +26,11 @@ var main = function () {
             var lookupEntry = function () {
                 rl.question('Name to look up: ', function(name) {
                     if (phonebookCurrent.hasOwnProperty(name)) {
-                        console.log(`${name}: ${phonebookCurrent[name]}`);
+                        console.log(`\n${name}: ${phonebookCurrent[name]}`);
                     }
                     else {
                         console.log('Error: name not found');
-                        rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-5)? `, function(answer) {
+                        rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-2)? `, function(answer) {
                             if (answer === '1') {
                                 lookupEntry();
                             }
@@ -65,7 +66,7 @@ var main = function () {
                         });
                     } else { 
                         console.log('Error: name not found');
-                        rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-5)? `, function(answer) {
+                        rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-2)? `, function(answer) {
                             if (answer === '1') {
                                 deleteEntry();
                             }
