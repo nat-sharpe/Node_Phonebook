@@ -9,6 +9,69 @@ var rl = readline.createInterface({
     output: process.stdout
   });
 
+var lookupEntry = function () {
+    rl.question('Name to look up: ', function(name) {
+        if (phonebookCurrent.hasOwnProperty(name)) {
+            console.log(`\n${name}: ${phonebookCurrent[name]}`);
+        }
+        else {
+            console.log('Error: name not found');
+            rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-2)? `, function(answer) {
+                if (answer === '1') {
+                    lookupEntry();
+                }
+                else {
+                    main();
+                }
+            });
+        }
+        main();
+    });
+};
+
+var deleteEntry = function () {
+    rl.question('Name to delete: ', function(name) {
+        if (phonebookCurrent.hasOwnProperty(name)) {
+            delete phonebookCurrent[name];
+            fs.writeFile(phonebookFile, JSON.stringify(phonebookCurrent), function() {
+                console.log(`Entry deleted.`);
+                main();
+            });
+        } else { 
+            console.log('Error: name not found');
+            rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-2)? `, function(answer) {
+                if (answer === '1') {
+                    deleteEntry();
+                }
+                else {
+                    main();
+                }
+            });
+        }
+    });
+};
+
+var setEntry = function () {
+    rl.question('Name: ', function(name) {
+        rl.question('Phone Number: ', function(number) {
+            phonebookCurrent[name] = number;
+            fs.writeFile(phonebookFile, JSON.stringify(phonebookCurrent), function() {
+                console.log(`Entry added.`);
+                main();
+            });
+        });
+    });
+}
+
+var printAllEntries = function () {
+    var keys = Object.keys(phonebookCurrent);
+    var printEntry = function (contact) {
+        console.log(`${contact}: ${phonebookCurrent[contact]}`)
+    };
+    keys.forEach(printEntry);
+    main();
+};
+
 var main = function () {
     fs.readFile(phonebookFile, 'utf8', function(error, data) {
         if (error) {
@@ -23,69 +86,16 @@ var main = function () {
             rl.close();
         }
         else if (answer === '1') {
-            var lookupEntry = function () {
-                rl.question('Name to look up: ', function(name) {
-                    if (phonebookCurrent.hasOwnProperty(name)) {
-                        console.log(`\n${name}: ${phonebookCurrent[name]}`);
-                    }
-                    else {
-                        console.log('Error: name not found');
-                        rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-2)? `, function(answer) {
-                            if (answer === '1') {
-                                lookupEntry();
-                            }
-                            else {
-                                main();
-                            }
-                        });
-                    }
-                    main();
-                });
-            };
             lookupEntry();
         }
         else if (answer === '2') {
-            rl.question('Name: ', function(name) {
-                rl.question('Phone Number: ', function(number) {
-                    phonebookCurrent[name] = number;
-                    fs.writeFile(phonebookFile, JSON.stringify(phonebookCurrent), function() {
-                        console.log(`Entry added.`);
-                        main();
-                    });
-                });
-            });
+            setEntry();
         }
         else if (answer === '3') {
-            var deleteEntry = function () {
-                rl.question('Name to delete: ', function(name) {
-                    if (phonebookCurrent.hasOwnProperty(name)) {
-                        delete phonebookCurrent[name];
-                        fs.writeFile(phonebookFile, JSON.stringify(phonebookCurrent), function() {
-                            console.log(`Entry deleted.`);
-                            main();
-                        });
-                    } else { 
-                        console.log('Error: name not found');
-                        rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-2)? `, function(answer) {
-                            if (answer === '1') {
-                                deleteEntry();
-                            }
-                            else {
-                                main();
-                            }
-                        });
-                    }
-                });
-            };
             deleteEntry();
         }
         else if (answer === '4') {
-            var keys = Object.keys(phonebookCurrent);
-            var printEntry = function (contact) {
-                console.log(`${contact}: ${phonebookCurrent[contact]}`)
-            };
-            keys.forEach(printEntry);
-            main();
+            printAllEntries();
         } else {
             console.log('Error: invalid command');
             main();
