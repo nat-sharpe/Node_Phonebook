@@ -22,16 +22,16 @@ var main = function () {
             rl.close();
         }
         else if (answer === '1') {
-            var lookupName = function () {
+            var lookupEntry = function () {
                 rl.question('Name to look up: ', function(name) {
-                    if (name in phonebookCurrent) {
+                    if (phonebookCurrent.hasOwnProperty(name)) {
                         console.log(`${name}: ${phonebookCurrent[name]}`);
                     }
                     else {
                         console.log('Error: name not found');
                         rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-5)? `, function(answer) {
                             if (answer === '1') {
-                                lookupName();
+                                lookupEntry();
                             }
                             else {
                                 main();
@@ -41,7 +41,7 @@ var main = function () {
                     main();
                 });
             };
-            lookupName();
+            lookupEntry();
         }
         else if (answer === '2') {
             rl.question('Name: ', function(name) {
@@ -55,13 +55,28 @@ var main = function () {
             });
         }
         else if (answer === '3') {
-            rl.question('Name to delete: ', function(name) {
-                delete phonebookCurrent[name];
-                fs.writeFile(phonebookFile, JSON.stringify(phonebookCurrent), function() {
-                    console.log(`Entry deleted.`);
-                    main();
+            var deleteEntry = function () {
+                rl.question('Name to delete: ', function(name) {
+                    if (phonebookCurrent.hasOwnProperty(name)) {
+                        delete phonebookCurrent[name];
+                        fs.writeFile(phonebookFile, JSON.stringify(phonebookCurrent), function() {
+                            console.log(`Entry deleted.`);
+                            main();
+                        });
+                    } else { 
+                        console.log('Error: name not found');
+                        rl.question(`1. Try another name\n2. Go to main menu\nWhat do you want to do (1-5)? `, function(answer) {
+                            if (answer === '1') {
+                                deleteEntry();
+                            }
+                            else {
+                                main();
+                            }
+                        });
+                    }
                 });
-            });
+            };
+            deleteEntry();
         }
         else if (answer === '4') {
             var keys = Object.keys(phonebookCurrent);
